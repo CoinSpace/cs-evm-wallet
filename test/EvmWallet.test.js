@@ -36,7 +36,7 @@ const ethereumATethereum = {
   decimals: 18,
 };
 
-const tetherATsolana = {
+const tetherATethereum = {
   _id: 'tether@ethereum',
   platform: 'ethereum',
   type: 'token',
@@ -52,7 +52,7 @@ let defaultOptionsToken;
 describe('EvmWallet.js', () => {
   beforeEach(() => {
     defaultOptionsCoin = utils.getDefaultOptionsCoin(ethereumATethereum);
-    defaultOptionsToken = utils.getDefaultOptionsToken(tetherATsolana, ethereumATethereum);
+    defaultOptionsToken = utils.getDefaultOptionsToken(tetherATethereum, ethereumATethereum);
   });
 
   afterEach(() => {
