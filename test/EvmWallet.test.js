@@ -74,6 +74,7 @@ describe('EvmWallet.js', () => {
       });
       assert.equal(wallet.state, Wallet.STATE_CREATED);
       assert.equal(wallet.gasLimit, 200000n);
+      assert.equal(wallet.tokenUrl, 'https://sepolia.etherscan.io/token/0xdac17f958d2ee523a2206206994597c13d831ec7');
     });
   });
 
