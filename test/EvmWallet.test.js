@@ -421,9 +421,8 @@ describe('EvmWallet.js', () => {
 
       utils.stubCoinBalance(request, IMPORT_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '1000000000000000000' });
 
-      const { amount, fee } = await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
-      assert.deepEqual(amount, new Amount(1000000000000000000n, wallet.crypto.decimals));
-      assert.deepEqual(fee, new Amount(630000000000000n, wallet.crypto.decimals));
+      const amount = await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
+      assert.deepEqual(amount, new Amount(999370000000000000n, wallet.crypto.decimals));
     });
 
     it('works (token)', async () => {
@@ -441,9 +440,8 @@ describe('EvmWallet.js', () => {
       utils.stubTokenBalance(request, TOKEN_ADDRESS, IMPORT_ADDRESS, { balance: '1000000', confirmedBalance: '1000000' });
       utils.stubCoinBalance(request, IMPORT_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '1000000000000000000' });
 
-      const { amount, fee } = await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
+      const amount = await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
       assert.deepEqual(amount, new Amount(1000000n, wallet.crypto.decimals));
-      assert.deepEqual(fee, new Amount(6000000000000000n, wallet.platform.decimals));
     });
 
     it('rejects own private key', async () => {
@@ -672,7 +670,7 @@ describe('EvmWallet.js', () => {
       const estimate = await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
       await wallet.createImport({ privateKey: IMPORT_PRIVATE_KEY });
 
-      assert.equal(wallet.balance.value, estimate.amount.value - estimate.fee.value);
+      assert.equal(wallet.balance.value, estimate.value);
       assert.equal(wallet.balance.value, 999370000000000000n);
     });
 
@@ -697,7 +695,7 @@ describe('EvmWallet.js', () => {
       const estimate = await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
       await wallet.createImport({ privateKey: IMPORT_PRIVATE_KEY });
 
-      assert.equal(wallet.balance.value, estimate.amount.value);
+      assert.equal(wallet.balance.value, estimate.value);
       assert.equal(wallet.balance.value, 1000000n);
     });
   });
