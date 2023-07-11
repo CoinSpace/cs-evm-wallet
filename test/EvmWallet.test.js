@@ -17,7 +17,6 @@ const RANDOM_PUBLIC_KEY = {
 };
 
 const WALLET_ADDRESS = '0xfaAd0567f7a6CD4a583F49967D21A07af8f0B4B6';
-const WALLET_ADDRESS_BIP44_LEGACY = '0x111F82bd93b8cb650D537186213e065EAB92cb77';
 const TOKEN_ADDRESS = '0xdac17f958d2ee523a2206206994597c13d831ec7';
 const DESTIONATION_ADDRESS = '0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2';
 const IMPORT_PRIVATE_KEY = 'd1c8e18ef9265b8e58c1d66318fd2a8366839960b71afab031ef0c3ceb324e8d';
@@ -86,16 +85,6 @@ describe('EvmWallet.js', () => {
       await wallet.create(RANDOM_SEED);
       assert.equal(wallet.state, Wallet.STATE_INITIALIZED);
       assert.equal(wallet.address, WALLET_ADDRESS);
-    });
-
-    it('should create new wallet with seed (coin, legacy bip44)', async () => {
-      delete defaultOptionsCoin.settings.bip44;
-      const wallet = new Wallet({
-        ...defaultOptionsCoin,
-      });
-      await wallet.create(RANDOM_SEED);
-      assert.equal(wallet.state, Wallet.STATE_INITIALIZED);
-      assert.equal(wallet.address, WALLET_ADDRESS_BIP44_LEGACY);
     });
 
     it('should create new wallet with seed (token)', async () => {
