@@ -6,6 +6,9 @@
       "from": "0xc0da5b1113d4de22fd50ccfc94e255cb13da0c9c",
       "to": "0xfaad0567f7a6cd4a583f49967d21a07af8f0b4b6",
       "value": "27063317196060000000000",
+      "gas": "40000",
+      "gasPrice": "34361864112",
+      "gasUsed": "40000",
       "confirmations": 221939,
       "timestamp": 1684025507
     },
@@ -15,6 +18,9 @@
       "from": "0xfaad0567f7a6cd4a583f49967d21a07af8f0b4b6",
       "to": "0xc0da5b1113d4de22fd50ccfc94e255cb13da0c9c",
       "value": "396000000000000000000",
+      "gas": "40000",
+      "gasPrice": "34361864112",
+      "gasUsed": "30000",
       "confirmations": 237211,
       "timestamp": 1683837083
     },
@@ -24,6 +30,9 @@
       "from": "0xc0da5b1113d4de22fd50ccfc94e255cb13da0c9c",
       "to": "0xd7b81aec9796f15d5a7081cf75588358bfe832fd",
       "value": "400000000000000000000",
+      "gas": "40000",
+      "gasPrice": "34361864112",
+      "gasUsed": "40000",
       "confirmations": 257174,
       "timestamp": 1683593831
     },
@@ -33,6 +42,9 @@
       "from": "0xc0da5b1113d4de22fd50ccfc94e255cb13da0c9c",
       "to": "0x35c8394ed4b1eda1d643ba5007e867980109db4c",
       "value": "333000000000000000000",
+      "gas": "40000",
+      "gasPrice": "34361864112",
+      "gasUsed": "40000",
       "confirmations": 257175,
       "timestamp": 1683593819
     },
@@ -42,6 +54,9 @@
       "from": "0xc0da5b1113d4de22fd50ccfc94e255cb13da0c9c",
       "to": "0x35c8394ed4b1eda1d643ba5007e867980109db4c",
       "value": "333000000000000000000",
+      "gas": "40000",
+      "gasPrice": "34361864112",
+      "gasUsed": "40000",
       "confirmations": 330511,
       "timestamp": 1682703239
     }

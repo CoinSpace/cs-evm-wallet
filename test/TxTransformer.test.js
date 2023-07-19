@@ -173,7 +173,7 @@ describe('TxTransformer.js', () => {
       assert.equal(tx.status, Transaction.STATUS_SUCCESS);
       assert.equal(tx.incoming, false);
       assert.equal(tx.rbf, false);
-      assert.equal(tx.fee.value, 0n);
+      assert.equal(tx.fee.value, 1030855923360000n);
       assert.equal(tx.amount.value, 396000000000000000000n);
       assert.equal(tx.confirmations, 237211);
       assert.equal(tx.from, '0xfaad0567f7a6cd4a583f49967d21a07af8f0b4b6');
