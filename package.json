@@ -6,6 +6,10 @@
   "license": "MIT",
   "type": "module",
   "main": "index.js",
+  "exports": {
+    ".": "./index.js",
+    "./errors": "./lib/errors.js"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/CoinSpace/cs-evm-wallet.git"

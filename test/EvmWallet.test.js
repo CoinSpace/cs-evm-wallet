@@ -1,6 +1,6 @@
 /* eslint-disable max-len */
 import { Amount } from '@coinspace/cs-common';
-import Wallet from '../index.js';
+import Wallet from '@coinspace/cs-evm-wallet';
 import assert from 'assert/strict';
 import fs from 'fs/promises';
 import sinon from 'sinon';
@@ -249,6 +249,32 @@ describe('EvmWallet.js', () => {
   });
 
   describe('validators', () => {
+    describe('validateGasLimit', () => {
+      let wallet;
+      beforeEach(async () => {
+        const request = sinon.stub(defaultOptionsCoin.account, 'request');
+        utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '2000000000000000000' });
+        wallet = new Wallet({
+          ...defaultOptionsCoin,
+        });
+        await wallet.open(RANDOM_PUBLIC_KEY);
+        await wallet.load();
+      });
+
+      it('valid gas limit', async () => {
+        assert.ok(await wallet.validateGasLimit({ gasLimit: 100500n }));
+      });
+
+      it('invalid gas limit', async () => {
+        await assert.rejects(async () => {
+          await wallet.validateGasLimit({ gasLimit: 0n });
+        }, {
+          name: 'GasLimitError',
+          message: 'Invalid gas limit',
+        });
+      });
+    });
+
     describe('validateAddress', () => {
       let wallet;
       beforeEach(async () => {
