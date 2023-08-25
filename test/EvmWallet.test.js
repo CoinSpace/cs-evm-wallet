@@ -642,7 +642,7 @@ describe('EvmWallet.js', () => {
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTxsCount(request, WALLET_ADDRESS, 10);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
-      utils.stubTransactionSend(request);
+      utils.stubTransactionSend(request, '1234');
 
       const wallet = new Wallet({
         ...defaultOptionsCoin,
@@ -650,12 +650,13 @@ describe('EvmWallet.js', () => {
       await wallet.open(RANDOM_PUBLIC_KEY);
       await wallet.load();
 
-      await wallet.createTransaction({
+      const id = await wallet.createTransaction({
         gasLimit: wallet.gasLimit,
         address: DESTIONATION_ADDRESS,
         amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
       }, RANDOM_SEED);
       assert.equal(wallet.balance.value, 999370000000000000n);
+      assert.equal(id, '1234');
     });
 
     it('should create valid transaction (token)', async () => {
@@ -664,7 +665,7 @@ describe('EvmWallet.js', () => {
       utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '2000000', confirmedBalance: '2000000' });
       utils.stubTxsCount(request, WALLET_ADDRESS, 10);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
-      utils.stubTransactionSend(request);
+      utils.stubTransactionSend(request, '1234');
 
       const wallet = new Wallet({
         ...defaultOptionsToken,
@@ -672,12 +673,13 @@ describe('EvmWallet.js', () => {
       await wallet.open(RANDOM_PUBLIC_KEY);
       await wallet.load();
 
-      await wallet.createTransaction({
+      const id = await wallet.createTransaction({
         gasLimit: wallet.gasLimit,
         address: DESTIONATION_ADDRESS,
         amount: new Amount(1_000000n, wallet.crypto.decimals),
       }, RANDOM_SEED);
       assert.equal(wallet.balance.value, 1_000000n);
+      assert.equal(id, '1234');
     });
   });
 
@@ -702,14 +704,15 @@ describe('EvmWallet.js', () => {
 
       utils.stubCoinBalance(request, IMPORT_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '1000000000000000000' });
       utils.stubTxsCount(request, IMPORT_ADDRESS, 10);
-      utils.stubTransactionSend(request);
+      utils.stubTransactionSend(request, '1234');
 
       assert.equal(wallet.balance.value, 0n);
       const estimate = await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
-      await wallet.createImport({ privateKey: IMPORT_PRIVATE_KEY });
+      const id = await wallet.createImport({ privateKey: IMPORT_PRIVATE_KEY });
 
       assert.equal(wallet.balance.value, estimate.value);
       assert.equal(wallet.balance.value, 999370000000000000n);
+      assert.equal(id, '1234');
     });
 
     it('works (token)', async () => {
@@ -727,14 +730,15 @@ describe('EvmWallet.js', () => {
       utils.stubTokenBalance(request, TOKEN_ADDRESS, IMPORT_ADDRESS, { balance: '1000000', confirmedBalance: '1000000' });
       utils.stubCoinBalance(request, IMPORT_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '1000000000000000000' });
       utils.stubTxsCount(request, IMPORT_ADDRESS, 10);
-      utils.stubTransactionSend(request);
+      utils.stubTransactionSend(request, '1234');
 
       assert.equal(wallet.balance.value, 0n);
       const estimate = await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
-      await wallet.createImport({ privateKey: IMPORT_PRIVATE_KEY });
+      const id = await wallet.createImport({ privateKey: IMPORT_PRIVATE_KEY });
 
       assert.equal(wallet.balance.value, estimate.value);
       assert.equal(wallet.balance.value, 1000000n);
+      assert.equal(id, '1234');
     });
   });
 
@@ -823,7 +827,7 @@ describe('EvmWallet.js', () => {
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTransactions(request, WALLET_ADDRESS, TRANSACTIONS);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
-      utils.stubTransactionSend(request);
+      utils.stubTransactionSend(request, '1234');
       wallet = new Wallet({
         ...defaultOptionsCoin,
       });
@@ -834,34 +838,38 @@ describe('EvmWallet.js', () => {
 
     it('replace tx (coin)', async () => {
       const before = wallet.balance.value;
-      await wallet.createReplacementTransaction(txs[0], RANDOM_SEED);
+      const id = await wallet.createReplacementTransaction(txs[0], RANDOM_SEED);
       const after = wallet.balance.value;
       assert.equal(before - after, 105000000000000n);
       assert.equal(after, 1_999895000000000000n);
+      assert.equal(id, '1234');
     });
 
     it('replace tx (coin) - legacy', async () => {
       const before = wallet.balance.value;
-      await wallet.createReplacementTransaction(txs[1], RANDOM_SEED);
+      const id = await wallet.createReplacementTransaction(txs[1], RANDOM_SEED);
       const after = wallet.balance.value;
       assert.equal(before - after, 105000000000000n);
       assert.equal(after, 1_999895000000000000n);
+      assert.equal(id, '1234');
     });
 
     it('replace tx (token)', async () => {
       const before = wallet.balance.value;
-      await wallet.createReplacementTransaction(txs[2], RANDOM_SEED);
+      const id = await wallet.createReplacementTransaction(txs[2], RANDOM_SEED);
       const after = wallet.balance.value;
       assert.equal(before - after, 1000000000000000n);
       assert.equal(after, 1999000000000000000n);
+      assert.equal(id, '1234');
     });
 
     it('replace tx (token) - legacy', async () => {
       const before = wallet.balance.value;
-      await wallet.createReplacementTransaction(txs[3], RANDOM_SEED);
+      const id = await wallet.createReplacementTransaction(txs[3], RANDOM_SEED);
       const after = wallet.balance.value;
       assert.equal(before - after, 1000000000000000n);
       assert.equal(after, 1999000000000000000n);
+      assert.equal(id, '1234');
     });
   });
 });
