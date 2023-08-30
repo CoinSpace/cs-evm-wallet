@@ -24,7 +24,7 @@
     "micro-eth-signer": "^0.6.2"
   },
   "peerDependencies": {
-    "@coinspace/cs-common": "^1.0.18"
+    "@coinspace/cs-common": "^1.0.21"
   },
   "devDependencies": {
     "eslint": "^8.38.0",
