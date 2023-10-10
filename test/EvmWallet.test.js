@@ -541,6 +541,7 @@ describe('EvmWallet.js', () => {
       }, {
         name: 'SmallAmountError',
         message: 'Small amount',
+        amount: new Amount(630000000000001n, wallet.crypto.decimals),
       });
     });
 
