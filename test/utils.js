@@ -6,6 +6,7 @@ function stubCoinBalance(request, address, { balance, confirmedBalance }) {
     method: 'GET',
     url: `api/v1/addr/${address.toLowerCase()}/balance`,
     baseURL: 'node',
+    headers: sinon.match.object,
     params: { confirmations: 12 },
   }).resolves({ balance, confirmedBalance });
 }
@@ -16,6 +17,7 @@ function stubTokenBalance(request, token, address, { balance, confirmedBalance }
     method: 'GET',
     url: `api/v1/token/${token.toLowerCase()}/${address.toLowerCase()}/balance`,
     baseURL: 'node',
+    headers: sinon.match.object,
     params: { confirmations: 12 },
   }).resolves({ balance, confirmedBalance });
 }
@@ -26,6 +28,7 @@ function stubGasFees(request, { maxFeePerGas, maxPriorityFeePerGas }) {
     method: 'GET',
     url: 'api/v1/gasFees',
     baseURL: 'node',
+    headers: sinon.match.object,
   }).resolves({ maxFeePerGas, maxPriorityFeePerGas });
 }
 
@@ -35,6 +38,7 @@ function stubTxsCount(request, address, count) {
     method: 'GET',
     url: `api/v1/addr/${address.toLowerCase()}/txsCount`,
     baseURL: 'node',
+    headers: sinon.match.object,
   }).resolves({ count });
 }
 
@@ -50,6 +54,7 @@ function stubTransactions(request, address, data) {
     method: 'GET',
     url: `api/v1/addr/${address.toLowerCase()}/txs`,
     baseURL: 'node',
+    headers: sinon.match.object,
     params: { cursor: 1 },
   }).resolves(data);
 }
@@ -60,6 +65,7 @@ function stubTokenTransactions(request, token, address, data) {
     method: 'GET',
     url: `api/v1/token/${token.toLowerCase()}/${address.toLowerCase()}/txs`,
     baseURL: 'node',
+    headers: sinon.match.object,
     params: { cursor: 1 },
   }).resolves(data);
 }
@@ -71,11 +77,11 @@ function getDefaultOptionsCoin(crypto) {
     cache: { get() {}, set() {} },
     settings: { bip44: "m/44'/60'/0'" },
     account: {
-      request(...args) { console.log(args); },
       market: {
         getPrice() { return 1723.03; },
       },
     },
+    request(...args) { console.log(args); },
     apiNode: 'node',
     storage: { get() {}, set() {}, save() {} },
     development: true,
@@ -89,11 +95,11 @@ function getDefaultOptionsToken(crypto, platform) {
     cache: { get() {}, set() {} },
     settings: { bip44: "m/44'/60'/0'" },
     account: {
-      request(...args) { console.log(args); },
       market: {
         getPrice() { return 1; },
       },
     },
+    request(...args) { console.log(args); },
     apiNode: 'node',
     storage: { get() {}, set() {}, save() {} },
     development: true,

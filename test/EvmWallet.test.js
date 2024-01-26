@@ -165,7 +165,7 @@ describe('EvmWallet.js', () => {
 
   describe('load', () => {
     it('should load wallet (coin)', async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '2000000000000000000' });
       const storage = sinon.mock(defaultOptionsCoin.storage);
       storage.expects('set').once().withArgs('balance', '1000000000000000000');
@@ -181,7 +181,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('should load wallet (token)', async () => {
-      const request = sinon.stub(defaultOptionsToken.account, 'request');
+      const request = sinon.stub(defaultOptionsToken, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '2000000000000000000' });
       utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '100000000', confirmedBalance: '200000000' });
       const storage = sinon.mock(defaultOptionsToken.storage);
@@ -198,11 +198,12 @@ describe('EvmWallet.js', () => {
     });
 
     it('should set STATE_ERROR on error', async () => {
+      sinon.stub(defaultOptionsCoin, 'request')
+        .withArgs(sinon.match.any).rejects();
       const wallet = new Wallet({
         ...defaultOptionsCoin,
       });
       await wallet.open(RANDOM_PUBLIC_KEY);
-      sinon.stub(defaultOptionsCoin.account, 'request');
       await assert.rejects(async () => {
         await wallet.load();
       });
@@ -252,7 +253,7 @@ describe('EvmWallet.js', () => {
     describe('validateGasLimit', () => {
       let wallet;
       beforeEach(async () => {
-        const request = sinon.stub(defaultOptionsCoin.account, 'request');
+        const request = sinon.stub(defaultOptionsCoin, 'request');
         utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '2000000000000000000' });
         wallet = new Wallet({
           ...defaultOptionsCoin,
@@ -278,7 +279,7 @@ describe('EvmWallet.js', () => {
     describe('validateAddress', () => {
       let wallet;
       beforeEach(async () => {
-        const request = sinon.stub(defaultOptionsCoin.account, 'request');
+        const request = sinon.stub(defaultOptionsCoin, 'request');
         utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '2000000000000000000' });
         wallet = new Wallet({
           ...defaultOptionsCoin,
@@ -313,7 +314,7 @@ describe('EvmWallet.js', () => {
     describe('validateAmount (coin)', () => {
       let wallet;
       beforeEach(async () => {
-        const request = sinon.stub(defaultOptionsCoin.account, 'request');
+        const request = sinon.stub(defaultOptionsCoin, 'request');
         utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '3000000000000000000', confirmedBalance: '2000000000000000000' });
         utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
         wallet = new Wallet({
@@ -379,7 +380,7 @@ describe('EvmWallet.js', () => {
       let wallet;
       let request;
       beforeEach(async () => {
-        request = sinon.stub(defaultOptionsToken.account, 'request');
+        request = sinon.stub(defaultOptionsToken, 'request');
         utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
         utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '2000000', confirmedBalance: '3000000' });
         utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
@@ -447,7 +448,7 @@ describe('EvmWallet.js', () => {
 
   describe('estimateImport', () => {
     it('works (coin)', async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
 
@@ -464,7 +465,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('works (token)', async () => {
-      const request = sinon.stub(defaultOptionsToken.account, 'request');
+      const request = sinon.stub(defaultOptionsToken, 'request');
       utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '0', confirmedBalance: '0' });
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '0', confirmedBalance: '0' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
@@ -483,7 +484,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('rejects own private key', async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTxsCount(request, WALLET_ADDRESS, 10);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
@@ -503,7 +504,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('throw error on invalid private key', async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
 
@@ -524,7 +525,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('throw error on empty private key', async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
 
@@ -546,7 +547,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('throw error on not enough coins for token transfer', async () => {
-      const request = sinon.stub(defaultOptionsToken.account, 'request');
+      const request = sinon.stub(defaultOptionsToken, 'request');
       utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '0', confirmedBalance: '0' });
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '0', confirmedBalance: '0' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
@@ -571,7 +572,7 @@ describe('EvmWallet.js', () => {
 
   describe('estimateMaxAmount', () => {
     it('should correct estimate max amount (coin)', async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
       const wallet = new Wallet({
@@ -585,7 +586,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('should correct estimate max amount (token)', async () => {
-      const request = sinon.stub(defaultOptionsToken.account, 'request');
+      const request = sinon.stub(defaultOptionsToken, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '2000000', confirmedBalance: '3000000' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
@@ -602,7 +603,7 @@ describe('EvmWallet.js', () => {
 
   describe('estimateTransactionFee', () => {
     it('should estimate transaction fee (coin)', async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
       const wallet = new Wallet({
@@ -619,7 +620,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('should estimate transaction fee (token)', async () => {
-      const request = sinon.stub(defaultOptionsToken.account, 'request');
+      const request = sinon.stub(defaultOptionsToken, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '2000000', confirmedBalance: '3000000' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
@@ -639,7 +640,7 @@ describe('EvmWallet.js', () => {
 
   describe('createTransaction', () => {
     it('should create valid transaction (coin)', async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTxsCount(request, WALLET_ADDRESS, 10);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
@@ -661,7 +662,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('should create valid transaction (token)', async () => {
-      const request = sinon.stub(defaultOptionsToken.account, 'request');
+      const request = sinon.stub(defaultOptionsToken, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '2000000', confirmedBalance: '2000000' });
       utils.stubTxsCount(request, WALLET_ADDRESS, 10);
@@ -693,7 +694,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('works (coin)', async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '0', confirmedBalance: '0' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
 
@@ -717,7 +718,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('works (token)', async () => {
-      const request = sinon.stub(defaultOptionsToken.account, 'request');
+      const request = sinon.stub(defaultOptionsToken, 'request');
       utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '0', confirmedBalance: '0' });
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '0', confirmedBalance: '0' });
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
@@ -745,7 +746,7 @@ describe('EvmWallet.js', () => {
 
   describe('loadTransactions', () => {
     it('should load transactions (coin)', async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTransactions(request, WALLET_ADDRESS, TRANSACTIONS);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
@@ -762,7 +763,7 @@ describe('EvmWallet.js', () => {
     });
 
     it('should load transactions (token)', async () => {
-      const request = sinon.stub(defaultOptionsToken.account, 'request');
+      const request = sinon.stub(defaultOptionsToken, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '2000000', confirmedBalance: '2000000' });
       utils.stubTokenTransactions(request, TOKEN_ADDRESS, WALLET_ADDRESS, TOKEN_TRANSACTIONS);
@@ -784,7 +785,7 @@ describe('EvmWallet.js', () => {
     let wallet;
     let txs;
     beforeEach(async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTransactions(request, WALLET_ADDRESS, TRANSACTIONS);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
@@ -824,7 +825,7 @@ describe('EvmWallet.js', () => {
     let wallet;
     let txs;
     beforeEach(async () => {
-      const request = sinon.stub(defaultOptionsCoin.account, 'request');
+      const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTransactions(request, WALLET_ADDRESS, TRANSACTIONS);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
