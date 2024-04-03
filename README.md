@@ -12,4 +12,5 @@ Supported coins:
 - Binance Smart Chain
 - Ethereum
 - Ethereum Classic
+- Optimism
 - Polygon
