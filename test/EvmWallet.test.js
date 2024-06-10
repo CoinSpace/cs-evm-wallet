@@ -874,4 +874,16 @@ describe('EvmWallet.js', () => {
       assert.equal(id, '1234');
     });
   });
+
+  describe('messenger', () => {
+    it('should sign message', () => {
+      const wallet = new Wallet({
+        ...defaultOptionsCoin,
+      });
+      const privateKey = '0x43ff8d9ae58f6f2ef437bd3543362d1d842ecca3b6cc578b46e862b47fd60020';
+      const msg = 'noble';
+      const sig = '0x425fbe7b4d5078c4f6538f6ae13c385874ce31478324feacf1795e2403bedc3d6e8204d3cc870c95bad45bdfa6e1f631044c8886d0ff8af93923f9bc051b16841b';
+      assert.equal(wallet.signMessage(msg, privateKey), sig);
+    });
+  });
 });
