@@ -424,8 +424,8 @@ describe('EvmWallet.js', () => {
             amount: new Amount(2_000000n, wallet.crypto.decimals),
           });
         }, {
-          name: 'InsufficientCoinForTokenTransactionError',
-          message: 'Insufficient funds for token transaction',
+          name: 'InsufficientCoinForTransactionFeeError',
+          message: 'Insufficient funds to pay the transaction fee',
           amount: new Amount(6000000_000000000n, wallet.platform.decimals),
         });
       });
@@ -564,8 +564,8 @@ describe('EvmWallet.js', () => {
       await assert.rejects(async () => {
         await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
       }, {
-        name: 'InsufficientCoinForTokenTransactionError',
-        message: 'Insufficient funds for token transaction',
+        name: 'InsufficientCoinForTransactionFeeError',
+        message: 'Insufficient funds to pay the transaction fee',
       });
     });
   });
