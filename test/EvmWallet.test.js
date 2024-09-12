@@ -886,4 +886,316 @@ describe('EvmWallet.js', () => {
       assert.equal(wallet.signMessage(msg, privateKey), sig);
     });
   });
+
+  describe('staking', () => {
+
+    let wallet;
+    let request;
+
+    beforeEach(async () => {
+      request = sinon.stub(defaultOptionsCoin, 'request');
+      utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '3000000000000000000', confirmedBalance: '2000000000000000000' });
+      utils.stubTransactions(request, WALLET_ADDRESS, TRANSACTIONS);
+      utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
+      utils.stubTransactionSend(request, '1234');
+      utils.stubTxsCount(request, WALLET_ADDRESS, 10);
+      wallet = new Wallet({
+        ...defaultOptionsCoin,
+      });
+      await wallet.open(RANDOM_PUBLIC_KEY);
+      await wallet.load();
+    });
+
+    it('should support staking', () => {
+      assert.ok(wallet.isStakingSupported);
+    });
+
+    describe('staking', () => {
+      it('should load staking data', async () => {
+        utils.stubStaking(request, WALLET_ADDRESS, {
+          staked: '2000000000000000000',
+          apr: 0.4,
+          minStakeAmount: '100000000000000000',
+        });
+        const data = await wallet.staking();
+        assert.equal(data.staked.value, 2000000000000000000n);
+        assert.equal(data.apr, 0.4);
+      });
+    });
+
+    describe('pendingRequests', () => {
+      it('should load pendingRequests data', async () => {
+        utils.stubPendingRequests(request, WALLET_ADDRESS, {
+          staking: '3000000000000000000',
+          unstaking: '2000000000000000000',
+          readyForClaim: '1000000000000000000',
+        });
+        const data = await wallet.pendingRequests();
+        assert.equal(data.staking.value, 3000000000000000000n);
+        assert.equal(data.unstaking.value, 2000000000000000000n);
+        assert.equal(data.readyForClaim.value, 1000000000000000000n);
+      });
+    });
+
+    describe('validateStakeAmount', () => {
+      it('should be valid amount', async () => {
+        const valid = await wallet.validateStakeAmount({
+          amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
+        });
+        assert.ok(valid);
+      });
+
+      it('throw on small amount', async () => {
+        await assert.rejects(async () => {
+          await wallet.validateStakeAmount({
+            amount: new Amount(100000000000n, wallet.crypto.decimals),
+          });
+        }, {
+          name: 'SmallAmountError',
+          message: 'Small amount',
+          amount: new Amount(100000000000000000n, wallet.crypto.decimals),
+        });
+      });
+
+      it('throw on big amount', async () => {
+        await assert.rejects(async () => {
+          await wallet.validateStakeAmount({
+            amount: new Amount(10_000000000000000000n, wallet.crypto.decimals),
+          });
+        }, {
+          name: 'BigAmountError',
+          message: 'Big amount',
+          amount: new Amount(1_985000000000000000n, wallet.crypto.decimals),
+        });
+      });
+
+      it('throw on big amount (pending funds)', async () => {
+        await assert.rejects(async () => {
+          await wallet.validateStakeAmount({
+            amount: new Amount(2_500000000000000000n, wallet.crypto.decimals),
+          });
+        }, {
+          name: 'BigAmountConfirmationPendingError',
+          message: 'Big amount, confirmation pending',
+          amount: new Amount(1_985000000000000000n, wallet.crypto.decimals),
+        });
+      });
+
+      it('throw coin balance less then fee', async () => {
+        utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '0', confirmedBalance: '0' });
+        await wallet.load();
+        await assert.rejects(async () => {
+          await wallet.validateStakeAmount({
+            amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
+          });
+        }, {
+          name: 'InsufficientCoinForTransactionFeeError',
+          message: 'Insufficient funds to pay the transaction fee',
+          amount: new Amount(15000000000000000n, wallet.platform.decimals),
+        });
+      });
+    });
+
+    describe('estimateStake', () => {
+      it('should estimate stake', async () => {
+        const amount = new Amount(1_000000000000000000n, wallet.crypto.decimals);
+        utils.stubStake(request, WALLET_ADDRESS, amount, {
+          data: '0x3a29dbae0000000000000000000000000000000000000000000000000000000000000000',
+          to: '0xAFA848357154a6a624686b348303EF9a13F63264',
+        });
+        const estimate = await wallet.estimateStake({
+          amount,
+        });
+        assert.deepEqual(estimate.fee, new Amount(15000000000000000n, wallet.crypto.decimals));
+        assert.equal(estimate.to, '0xAFA848357154a6a624686b348303EF9a13F63264');
+      });
+    });
+
+    describe('estimateStakeMaxAmount', () => {
+      it('should estimate stake max amount', async () => {
+        const maxAmount = await wallet.estimateStakeMaxAmount();
+        assert.equal(maxAmount.value, 1_985000000000000000n);
+      });
+    });
+
+    describe('stake', () => {
+      it('works', async () => {
+        const amount = new Amount(1_000000000000000000n, wallet.crypto.decimals);
+        utils.stubStake(request, WALLET_ADDRESS, amount, {
+          data: '0x3a29dbae0000000000000000000000000000000000000000000000000000000000000000',
+          to: '0xAFA848357154a6a624686b348303EF9a13F63264',
+        });
+        const balance = wallet.balance.value;
+        const { fee } = await wallet.estimateStake({
+          amount,
+        });
+        const id = await wallet.stake({ amount }, RANDOM_SEED);
+        assert.equal(wallet.balance.value, (balance - fee.value - amount.value));
+        assert.equal(wallet.balance.value, 1985000000000000000n);
+        assert.equal(id, '1234');
+      });
+    });
+
+    describe('validateUnstakeAmount', () => {
+
+      beforeEach(async () => {
+        utils.stubStaking(request, WALLET_ADDRESS, {
+          staked: '2000000000000000000',
+          apr: 0.4,
+          minStakeAmount: '100000000000000000',
+        });
+        await wallet.staking();
+      });
+
+      it('should be valid amount', async () => {
+        const valid = await wallet.validateUnstakeAmount({
+          amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
+        });
+        assert.ok(valid);
+      });
+
+      it('throw on small amount', async () => {
+        await assert.rejects(async () => {
+          await wallet.validateUnstakeAmount({
+            amount: new Amount(1n, wallet.crypto.decimals),
+          });
+        }, {
+          name: 'SmallAmountError',
+          message: 'Small amount',
+          amount: new Amount(2n, wallet.crypto.decimals),
+        });
+      });
+
+      it('throw on big amount', async () => {
+        await assert.rejects(async () => {
+          await wallet.validateUnstakeAmount({
+            amount: new Amount(10_000000000000000000n, wallet.crypto.decimals),
+          });
+        }, {
+          name: 'BigAmountError',
+          message: 'Big amount',
+          amount: new Amount(2_000000000000000000n, wallet.crypto.decimals),
+        });
+      });
+
+      it('throw coin balance less then fee', async () => {
+        utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '0', confirmedBalance: '0' });
+        await wallet.load();
+        await assert.rejects(async () => {
+          await wallet.validateUnstakeAmount({
+            amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
+          });
+        }, {
+          name: 'InsufficientCoinForTransactionFeeError',
+          message: 'Insufficient funds to pay the transaction fee',
+          amount: new Amount(15000000000000000n, wallet.platform.decimals),
+        });
+      });
+    });
+
+    describe('estimateUnstake', () => {
+      it('should estimate unstake', async () => {
+        utils.stubStaking(request, WALLET_ADDRESS, {
+          staked: '2000000000000000000',
+          apr: 0.4,
+          minStakeAmount: '100000000000000000',
+        });
+        await wallet.staking();
+
+        const amount = new Amount(1_000000000000000000n, wallet.crypto.decimals);
+        utils.stubUnstake(request, WALLET_ADDRESS, amount, {
+          to: '0xAFA848357154a6a624686b348303EF9a13F63264',
+          data: '0x76ec871c00000000000000000000000000000000000000000000000000000002540be40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+        });
+        const fee = await wallet.estimateUnstake({
+          amount,
+        });
+        assert.deepEqual(fee, new Amount(15000000000000000n, wallet.crypto.decimals));
+      });
+    });
+
+    describe('estimateUnstakeMaxAmount', () => {
+      it('should estimate unstake max amount', async () => {
+        utils.stubStaking(request, WALLET_ADDRESS, {
+          staked: '2000000000000000000',
+          apr: 0.4,
+          minStakeAmount: '100000000000000000',
+        });
+        await wallet.staking();
+
+        const maxAmount = await wallet.estimateUnstakeMaxAmount();
+        assert.equal(maxAmount.value, 2_000000000000000000n);
+      });
+    });
+
+    describe('unstake', () => {
+      it('works', async () => {
+        utils.stubStaking(request, WALLET_ADDRESS, {
+          staked: '2000000000000000000',
+          apr: 0.4,
+          minStakeAmount: '100000000000000000',
+        });
+        await wallet.staking();
+        const amount = new Amount(1_000000000000000000n, wallet.crypto.decimals);
+        utils.stubUnstake(request, WALLET_ADDRESS, amount, {
+          to: '0xAFA848357154a6a624686b348303EF9a13F63264',
+          data: '0x76ec871c00000000000000000000000000000000000000000000000000000002540be40000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000',
+        });
+        const balance = wallet.balance.value;
+        const fee = await wallet.estimateUnstake({
+          amount,
+        });
+        const id = await wallet.unstake({ amount }, RANDOM_SEED);
+        assert.equal(wallet.balance.value, (balance - fee.value));
+        assert.equal(wallet.balance.value, 2_985000000000000000n);
+        assert.equal(id, '1234');
+      });
+    });
+
+    describe('validateClaim', () => {
+
+      it('should be valid', async () => {
+        const valid = await wallet.validateClaim();
+        assert.ok(valid);
+      });
+
+      it('throw coin balance less then fee', async () => {
+        utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '0', confirmedBalance: '0' });
+        await wallet.load();
+        await assert.rejects(async () => {
+          await wallet.validateClaim();
+        }, {
+          name: 'InsufficientCoinForTransactionFeeError',
+          message: 'Insufficient funds to pay the transaction fee',
+          amount: new Amount(15000000000000000n, wallet.platform.decimals),
+        });
+      });
+    });
+
+    describe('estimateClaim', () => {
+      it('should estimate claim', async () => {
+        utils.stubClaim(request, WALLET_ADDRESS, {
+          to: '0x624087DD1904ab122A32878Ce9e933C7071F53B9',
+          data: '0x33986ffa',
+        });
+        const fee = await wallet.estimateClaim();
+        assert.deepEqual(fee, new Amount(15000000000000000n, wallet.crypto.decimals));
+      });
+    });
+
+    describe('claim', () => {
+      it('works', async () => {
+        utils.stubClaim(request, WALLET_ADDRESS, {
+          to: '0x624087DD1904ab122A32878Ce9e933C7071F53B9',
+          data: '0x33986ffa',
+        });
+        const balance = wallet.balance.value;
+        const fee = await wallet.estimateClaim();
+        const id = await wallet.claim(RANDOM_SEED);
+        assert.equal(wallet.balance.value, (balance - fee.value));
+        assert.equal(wallet.balance.value, 2_985000000000000000n);
+        assert.equal(id, '1234');
+      });
+    });
+  });
 });

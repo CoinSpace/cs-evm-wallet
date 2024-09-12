@@ -70,6 +70,58 @@ function stubTokenTransactions(request, token, address, data) {
   }).resolves(data);
 }
 
+function stubStaking(request, address, data) {
+  request.withArgs({
+    seed: 'device',
+    method: 'GET',
+    url: `api/v1/addr/${address.toLowerCase()}/staking`,
+    baseURL: 'node',
+    headers: sinon.match.object,
+  }).resolves(data);
+}
+
+function stubPendingRequests(request, address, data) {
+  request.withArgs({
+    seed: 'device',
+    method: 'GET',
+    url: `api/v1/addr/${address.toLowerCase()}/pendingRequests`,
+    baseURL: 'node',
+    headers: sinon.match.object,
+  }).resolves(data);
+}
+
+function stubStake(request, address, amount, data) {
+  request.withArgs({
+    seed: 'device',
+    method: 'GET',
+    url: `api/v1/addr/${address.toLowerCase()}/stake`,
+    baseURL: 'node',
+    headers: sinon.match.object,
+    params: { amount },
+  }).resolves(data);
+}
+
+function stubUnstake(request, address, amount, data) {
+  request.withArgs({
+    seed: 'device',
+    method: 'GET',
+    url: `api/v1/addr/${address.toLowerCase()}/unstake`,
+    baseURL: 'node',
+    headers: sinon.match.object,
+    params: { amount },
+  }).resolves(data);
+}
+
+function stubClaim(request, address, data) {
+  request.withArgs({
+    seed: 'device',
+    method: 'GET',
+    url: `api/v1/addr/${address.toLowerCase()}/claim`,
+    baseURL: 'node',
+    headers: sinon.match.object,
+  }).resolves(data);
+}
+
 function getDefaultOptionsCoin(crypto) {
   return {
     crypto,
@@ -114,6 +166,11 @@ export default {
   stubTransactionSend,
   stubTransactions,
   stubTokenTransactions,
+  stubStaking,
+  stubPendingRequests,
+  stubStake,
+  stubUnstake,
+  stubClaim,
   getDefaultOptionsCoin,
   getDefaultOptionsToken,
 };
