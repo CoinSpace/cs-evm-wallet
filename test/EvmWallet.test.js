@@ -24,6 +24,7 @@ const IMPORT_ADDRESS = '0x840f6500ee60c0acfb13cd40cbeba501d7226fda';
 
 const TRANSACTIONS = JSON.parse(await fs.readFile('./test/fixtures/transactions.json'));
 const TOKEN_TRANSACTIONS = JSON.parse(await fs.readFile('./test/fixtures/tokenTransactions.json'));
+const TYPED_DATA = JSON.parse(await fs.readFile('./test/fixtures/TypedData.json'));
 
 const ethereumATethereum = {
   _id: 'ethereum@ethereum',
@@ -876,14 +877,30 @@ describe('EvmWallet.js', () => {
   });
 
   describe('messenger', () => {
-    it('should sign message', () => {
+    it('should sign hex message', async () => {
       const wallet = new Wallet({
         ...defaultOptionsCoin,
       });
-      const privateKey = '0x43ff8d9ae58f6f2ef437bd3543362d1d842ecca3b6cc578b46e862b47fd60020';
-      const msg = 'noble';
-      const sig = '0x425fbe7b4d5078c4f6538f6ae13c385874ce31478324feacf1795e2403bedc3d6e8204d3cc870c95bad45bdfa6e1f631044c8886d0ff8af93923f9bc051b16841b';
-      assert.equal(wallet.signMessage(msg, privateKey), sig);
+      const msg = '0x74657374';
+      const sig = '0xf1f81e723c5779754de71610734e8b7e9cea40c1420b87c3bd4b2cbdcd44a85a0bc3bffb7e6c5be7301ead3844e5134d1b706c0fff8fa9bcbab74a5b63c26bd21b';
+      assert.equal(await wallet.eth_sign(msg, RANDOM_SEED), sig);
+    });
+
+    it('should sign utf8 message', async () => {
+      const wallet = new Wallet({
+        ...defaultOptionsCoin,
+      });
+      const msg = 'test';
+      const sig = '0xf1f81e723c5779754de71610734e8b7e9cea40c1420b87c3bd4b2cbdcd44a85a0bc3bffb7e6c5be7301ead3844e5134d1b706c0fff8fa9bcbab74a5b63c26bd21b';
+      assert.equal(await wallet.eth_sign(msg, RANDOM_SEED), sig);
+    });
+
+    it('should sign TypedData', async () => {
+      const wallet = new Wallet({
+        ...defaultOptionsCoin,
+      });
+      const sig = '0xccc50f41fb89447eb1964c2deb51ba5182a1afe15d0b44dea690c3161d4d84854f939d20fa29c2112cc1f5c8232719dd5e139335b92935dfa880cf8f8312034b1b';
+      assert.equal(await wallet.eth_signTypedData(TYPED_DATA, RANDOM_SEED), sig);
     });
   });
 
