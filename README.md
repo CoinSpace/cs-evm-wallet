@@ -9,6 +9,7 @@ EVM wallet for [Coin Wallet](https://github.com/CoinSpace/CoinSpace).
 Supported coins:
 - Arbitrum One
 - Avalanche
+- Base
 - Binance Smart Chain
 - Ethereum
 - Ethereum Classic
