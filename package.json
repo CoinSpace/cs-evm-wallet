@@ -27,33 +27,9 @@
     "@coinspace/cs-common": "^1.1.6"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
-    "eslint-config-coinspace": "^2.1.2",
-    "mocha": "^10.7.3",
+    "eslint": "^9.21.0",
+    "eslint-config-coinspace": "^3.0.0",
+    "mocha": "^11.1.0",
     "sinon": "^19.0.2"
-  },
-  "eslintConfig": {
-    "extends": [
-      "coinspace"
-    ],
-    "env": {
-      "browser": true
-    },
-    "parserOptions": {
-      "requireConfigFile": false,
-      "sourceType": "module"
-    },
-    "overrides": [
-      {
-        "files": [
-          "*.test.js",
-          "test/*"
-        ],
-        "env": {
-          "node": true,
-          "mocha": true
-        }
-      }
-    ]
   }
 }

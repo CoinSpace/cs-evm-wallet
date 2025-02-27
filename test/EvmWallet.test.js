@@ -1,7 +1,9 @@
 /* eslint-disable max-len */
+import { Buffer } from 'node:buffer';
+import assert from 'node:assert/strict';
+
 import { Amount } from '@coinspace/cs-common';
 import Wallet from '@coinspace/cs-evm-wallet';
-import assert from 'assert/strict';
 import fs from 'fs/promises';
 import sinon from 'sinon';
 
