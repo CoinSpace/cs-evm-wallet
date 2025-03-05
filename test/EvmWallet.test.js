@@ -78,6 +78,11 @@ describe('EvmWallet.js', () => {
       assert.equal(wallet.gasLimit, 200000n);
       assert.equal(wallet.tokenUrl, 'https://holesky.etherscan.io/token/0xdac17f958d2ee523a2206206994597c13d831ec7');
     });
+
+    it('wallet should have tokenUrl static method', () => {
+      const url = Wallet.tokenUrl('ethereum', '0xdac17f958d2ee523a2206206994597c13d831ec7', false);
+      assert.equal(url, 'https://etherscan.io/token/0xdac17f958d2ee523a2206206994597c13d831ec7');
+    });
   });
 
   describe('create wallet', () => {
