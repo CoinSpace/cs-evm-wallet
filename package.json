@@ -21,7 +21,7 @@
   "dependencies": {
     "@noble/hashes": "^1.5.0",
     "@scure/bip32": "^1.5.0",
-    "micro-eth-signer": "^0.12.0"
+    "micro-eth-signer": "^0.15.0"
   },
   "peerDependencies": {
     "@coinspace/cs-common": "^1.1.6"

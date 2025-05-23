@@ -890,7 +890,7 @@ describe('EvmWallet.js', () => {
       });
       const msg = '0x74657374';
       const sig = '0xf1f81e723c5779754de71610734e8b7e9cea40c1420b87c3bd4b2cbdcd44a85a0bc3bffb7e6c5be7301ead3844e5134d1b706c0fff8fa9bcbab74a5b63c26bd21b';
-      assert.equal(await wallet.eth_sign(msg, RANDOM_SEED), sig);
+      assert.equal(await wallet.eth_sign(msg, RANDOM_SEED, false), sig);
     });
 
     it('should sign utf8 message', async () => {
@@ -899,7 +899,7 @@ describe('EvmWallet.js', () => {
       });
       const msg = 'test';
       const sig = '0xf1f81e723c5779754de71610734e8b7e9cea40c1420b87c3bd4b2cbdcd44a85a0bc3bffb7e6c5be7301ead3844e5134d1b706c0fff8fa9bcbab74a5b63c26bd21b';
-      assert.equal(await wallet.eth_sign(msg, RANDOM_SEED), sig);
+      assert.equal(await wallet.eth_sign(msg, RANDOM_SEED, false), sig);
     });
 
     it('should sign TypedData', async () => {
@@ -907,7 +907,7 @@ describe('EvmWallet.js', () => {
         ...defaultOptionsCoin,
       });
       const sig = '0xccc50f41fb89447eb1964c2deb51ba5182a1afe15d0b44dea690c3161d4d84854f939d20fa29c2112cc1f5c8232719dd5e139335b92935dfa880cf8f8312034b1b';
-      assert.equal(await wallet.eth_signTypedData(TYPED_DATA, RANDOM_SEED), sig);
+      assert.equal(await wallet.eth_signTypedData(TYPED_DATA, RANDOM_SEED, false), sig);
     });
   });
 
