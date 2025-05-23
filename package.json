@@ -1,6 +1,6 @@
 {
   "name": "@coinspace/cs-evm-wallet",
-  "version": "1.8.2",
+  "version": "1.9.0",
   "description": "EVM Wallet for Coin Wallet",
   "author": "Coin Wallet <support@coin.space> (https://coin.space/)",
   "license": "MIT",
