@@ -15,7 +15,7 @@
     "url": "https://github.com/CoinSpace/cs-evm-wallet.git"
   },
   "scripts": {
-    "lint": "eslint lib test index.js",
+    "lint": "eslint --report-unused-disable-directives .",
     "test": "mocha test --reporter spec"
   },
   "dependencies": {

@@ -647,12 +647,12 @@ describe('EvmWallet.js', () => {
   });
 
   describe('createTransaction', () => {
-    it('should create valid transaction (coin)', async () => {
+    it('should create valid transaction (Ethereum coin)', async () => {
       const request = sinon.stub(defaultOptionsCoin, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTxsCount(request, WALLET_ADDRESS, 10);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
-      utils.stubTransactionSend(request, '1234');
+      utils.stubTransactionSend(request, '1234', '0x02f8758242680a843b9aca008506fc23ac0082520894c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2880de0b6b3a764000080c001a04d19ab019b1a9ac70c26c32cc2b83bd9d65b2b3c3ed3e68bead499c509b481caa01222b1a3b8bf218db5f1329709b5731079b53570279c0c12561f9298ee9705e8');
 
       const wallet = new Wallet({
         ...defaultOptionsCoin,
@@ -664,18 +664,18 @@ describe('EvmWallet.js', () => {
         gasLimit: wallet.gasLimit,
         address: DESTIONATION_ADDRESS,
         amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
-      }, RANDOM_SEED);
+      }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 999370000000000000n);
       assert.equal(id, '1234');
     });
 
-    it('should create valid transaction (token)', async () => {
+    it('should create valid transaction (Ethereum token)', async () => {
       const request = sinon.stub(defaultOptionsToken, 'request');
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '2000000', confirmedBalance: '2000000' });
       utils.stubTxsCount(request, WALLET_ADDRESS, 10);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
-      utils.stubTransactionSend(request, '1234');
+      utils.stubTransactionSend(request, '1234', '0x02f8b38242680a843b9aca008506fc23ac0083030d4094dac17f958d2ee523a2206206994597c13d831ec780b844a9059cbb000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000f4240c080a0ab76b8a31bf32d88a5c64f4f7fd0fe36112ed67dc2a222c8eff3534ae525570fa0185412310af12c771e7b474e158208a45f5a58f5088925389ccec4bd8df10936');
 
       const wallet = new Wallet({
         ...defaultOptionsToken,
@@ -687,7 +687,113 @@ describe('EvmWallet.js', () => {
         gasLimit: wallet.gasLimit,
         address: DESTIONATION_ADDRESS,
         amount: new Amount(1_000000n, wallet.crypto.decimals),
-      }, RANDOM_SEED);
+      }, RANDOM_SEED, false);
+      assert.equal(wallet.balance.value, 1_000000n);
+      assert.equal(id, '1234');
+    });
+
+    it('should create valid transaction (Ethereum Classic coin)', async () => {
+      const request = sinon.stub(defaultOptionsCoin, 'request');
+      utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' }, 120);
+      utils.stubTxsCount(request, WALLET_ADDRESS, 10);
+      utils.stubGasPrice(request, { price: '1000000000' });
+      utils.stubTransactionSend(request, '1234', '0xf86c0a843b9aca0082520894c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2880de0b6b3a76400008081a2a091f3f81e93451abea429dc9578387f6781834129cf27d8508ccf71d8db21ab80a01faa40558e6fd4c7c9d493f16c9f6878cc0cb2eb7c3b59c0569caaac03d82564');
+
+      const wallet = new Wallet({
+        ...defaultOptionsCoin,
+        crypto: {
+          ...ethereumATethereum,
+          platform: 'ethereum-classic',
+        },
+      });
+      await wallet.open(RANDOM_PUBLIC_KEY);
+      await wallet.load();
+
+      const id = await wallet.createTransaction({
+        gasLimit: wallet.gasLimit,
+        address: DESTIONATION_ADDRESS,
+        amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
+      }, RANDOM_SEED, false);
+      assert.equal(wallet.balance.value, 999979000000000000n);
+      assert.equal(id, '1234');
+    });
+
+    it('should create valid transaction (Ethereum Classic token)', async () => {
+      const request = sinon.stub(defaultOptionsToken, 'request');
+      utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' }, 120);
+      utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '2000000', confirmedBalance: '2000000' }, 120);
+      utils.stubTxsCount(request, WALLET_ADDRESS, 10);
+      utils.stubGasPrice(request, { price: '1000000000' });
+      utils.stubTransactionSend(request, '1234', '0xf8aa0a843b9aca0083030d4094dac17f958d2ee523a2206206994597c13d831ec780b844a9059cbb000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000f424081a1a02eb1af532e3c040f81582b19ea7be687d6a3ead10c82eeba77209379f782af01a04ad362a0db1edf922b1133c22af1ddec2e749318bd8c829e29f8f59442466900');
+
+      const wallet = new Wallet({
+        ...defaultOptionsToken,
+        crypto: {
+          ...tetherATethereum,
+          platform: 'ethereum-classic',
+        },
+      });
+      await wallet.open(RANDOM_PUBLIC_KEY);
+      await wallet.load();
+
+      const id = await wallet.createTransaction({
+        gasLimit: wallet.gasLimit,
+        address: DESTIONATION_ADDRESS,
+        amount: new Amount(1_000000n, wallet.crypto.decimals),
+      }, RANDOM_SEED, false);
+      assert.equal(wallet.balance.value, 1_000000n);
+      assert.equal(id, '1234');
+    });
+
+    it('should create valid transaction (Optimism coin)', async () => {
+      const request = sinon.stub(defaultOptionsCoin, 'request');
+      utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
+      utils.stubTxsCount(request, WALLET_ADDRESS, 10);
+      utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
+      utils.stubTransactionSend(request, '1234', '0x02f87683aa37dc0a843b9aca008506fc23ac0082520894c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2880de0b6b3a764000080c080a022fa90a9e2d73b8797064fb46a8fb1e179e7a7bddabd23bc35c10ca074e82313a03c5fa37bbaa1f850c49bd425743a23ea7dacec74c92aabf9fb4407f2a82280c7');
+
+      const wallet = new Wallet({
+        ...defaultOptionsCoin,
+        crypto: {
+          ...ethereumATethereum,
+          platform: 'optimism',
+        },
+      });
+      await wallet.open(RANDOM_PUBLIC_KEY);
+      await wallet.load();
+
+      const id = await wallet.createTransaction({
+        gasLimit: wallet.gasLimit,
+        address: DESTIONATION_ADDRESS,
+        amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
+      }, RANDOM_SEED, false);
+      assert.equal(wallet.balance.value, 999370000000000000n);
+      assert.equal(id, '1234');
+    });
+
+    it('should create valid transaction (Optimism token)', async () => {
+      const request = sinon.stub(defaultOptionsToken, 'request');
+      utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
+      utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '2000000', confirmedBalance: '2000000' });
+      utils.stubTxsCount(request, WALLET_ADDRESS, 10);
+      utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
+      utils.stubTransactionSend(request, '1234', '0x02f8b483aa37dc0a843b9aca008506fc23ac0083030d4094dac17f958d2ee523a2206206994597c13d831ec780b844a9059cbb000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000f4240c080a03780366ded5d50c7b9529b4e8249df1c8470b74ba93a6b6929b12446958ede36a06ffc4213390b15e359690cf7ff96d99cca91e57821a5ead53fd90e54777dba58');
+
+      const wallet = new Wallet({
+        ...defaultOptionsToken,
+        crypto: {
+          ...tetherATethereum,
+          platform: 'optimism',
+        },
+      });
+      await wallet.open(RANDOM_PUBLIC_KEY);
+      await wallet.load();
+
+      const id = await wallet.createTransaction({
+        gasLimit: wallet.gasLimit,
+        address: DESTIONATION_ADDRESS,
+        amount: new Amount(1_000000n, wallet.crypto.decimals),
+      }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 1_000000n);
       assert.equal(id, '1234');
     });
@@ -714,11 +820,11 @@ describe('EvmWallet.js', () => {
 
       utils.stubCoinBalance(request, IMPORT_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '1000000000000000000' });
       utils.stubTxsCount(request, IMPORT_ADDRESS, 10);
-      utils.stubTransactionSend(request, '1234');
+      utils.stubTransactionSend(request, '1234', '0x02f8758242680a843b9aca008506fc23ac0082520894faad0567f7a6cd4a583f49967d21a07af8f0b4b6880dde79b8592ea00080c001a0e50ad0d3071d65a3b58c83b68f505940eeac69aa83f48bb589723ee26f94b069a035729cf37e169b50bc5a76e6be80a75c33d0da5dead471f936fce1b5f7bb4271');
 
       assert.equal(wallet.balance.value, 0n);
       const estimate = await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
-      const id = await wallet.createImport({ privateKey: IMPORT_PRIVATE_KEY });
+      const id = await wallet.createImport({ privateKey: IMPORT_PRIVATE_KEY }, false);
 
       assert.equal(wallet.balance.value, estimate.value);
       assert.equal(wallet.balance.value, 999370000000000000n);
@@ -740,11 +846,11 @@ describe('EvmWallet.js', () => {
       utils.stubTokenBalance(request, TOKEN_ADDRESS, IMPORT_ADDRESS, { balance: '1000000', confirmedBalance: '1000000' });
       utils.stubCoinBalance(request, IMPORT_ADDRESS, { balance: '1000000000000000000', confirmedBalance: '1000000000000000000' });
       utils.stubTxsCount(request, IMPORT_ADDRESS, 10);
-      utils.stubTransactionSend(request, '1234');
+      utils.stubTransactionSend(request, '1234', '0x02f8b38242680a843b9aca008506fc23ac0083030d4094dac17f958d2ee523a2206206994597c13d831ec780b844a9059cbb000000000000000000000000faad0567f7a6cd4a583f49967d21a07af8f0b4b600000000000000000000000000000000000000000000000000000000000f4240c080a0f796549f0bf2954ed134d4b5853620a4c65589f76d2f26d843bca4f45929ff28a04a6f02a1a0f6af1ca1cad7ece1ca6952415937dad87022362e482c6ee338a517');
 
       assert.equal(wallet.balance.value, 0n);
       const estimate = await wallet.estimateImport({ privateKey: IMPORT_PRIVATE_KEY });
-      const id = await wallet.createImport({ privateKey: IMPORT_PRIVATE_KEY });
+      const id = await wallet.createImport({ privateKey: IMPORT_PRIVATE_KEY }, false);
 
       assert.equal(wallet.balance.value, estimate.value);
       assert.equal(wallet.balance.value, 1000000n);

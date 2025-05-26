@@ -1,24 +1,24 @@
 import sinon from 'sinon';
 
-function stubCoinBalance(request, address, { balance, confirmedBalance }) {
+function stubCoinBalance(request, address, { balance, confirmedBalance }, confirmations = 12) {
   request.withArgs({
     seed: 'device',
     method: 'GET',
     url: `api/v1/addr/${address.toLowerCase()}/balance`,
     baseURL: 'node',
     headers: sinon.match.object,
-    params: { confirmations: 12 },
+    params: { confirmations },
   }).resolves({ balance, confirmedBalance });
 }
 
-function stubTokenBalance(request, token, address, { balance, confirmedBalance }) {
+function stubTokenBalance(request, token, address, { balance, confirmedBalance }, confirmations = 12) {
   request.withArgs({
     seed: 'device',
     method: 'GET',
     url: `api/v1/token/${token.toLowerCase()}/${address.toLowerCase()}/balance`,
     baseURL: 'node',
     headers: sinon.match.object,
-    params: { confirmations: 12 },
+    params: { confirmations },
   }).resolves({ balance, confirmedBalance });
 }
 
@@ -32,6 +32,16 @@ function stubGasFees(request, { maxFeePerGas, maxPriorityFeePerGas }) {
   }).resolves({ maxFeePerGas, maxPriorityFeePerGas });
 }
 
+function stubGasPrice(request, { price }) {
+  request.withArgs({
+    seed: 'device',
+    method: 'GET',
+    url: 'api/v1/gasPrice',
+    baseURL: 'node',
+    headers: sinon.match.object,
+  }).resolves({ price });
+}
+
 function stubTxsCount(request, address, count) {
   request.withArgs({
     seed: 'device',
@@ -42,10 +52,15 @@ function stubTxsCount(request, address, count) {
   }).resolves({ count });
 }
 
-function stubTransactionSend(request, txId) {
-  request.withArgs(sinon.match((value) => {
-    return value?.url === 'api/v1/tx/send';
-  })).resolves({ txId });
+function stubTransactionSend(request, txId, txData) {
+  request.withArgs({
+    seed: 'device',
+    method: 'POST',
+    url: 'api/v1/tx/send',
+    baseURL: 'node',
+    headers: sinon.match.object,
+    data: { rawtx: txData ? txData : sinon.match.string },
+  }).resolves({ txId });
 }
 
 function stubTransactions(request, address, data) {
@@ -162,6 +177,7 @@ export default {
   stubCoinBalance,
   stubTokenBalance,
   stubGasFees,
+  stubGasPrice,
   stubTxsCount,
   stubTransactionSend,
   stubTransactions,
