@@ -797,6 +797,59 @@ describe('EvmWallet.js', () => {
       assert.equal(wallet.balance.value, 1_000000n);
       assert.equal(id, '1234');
     });
+
+    it('should create valid transaction (Arbitrum coin)', async () => {
+      const request = sinon.stub(defaultOptionsCoin, 'request');
+      utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
+      utils.stubTxsCount(request, WALLET_ADDRESS, 10);
+      utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
+      utils.stubTransactionSend(request, '1234', '0x02f87783066eee0a843b9aca008506fc23ac00830f424094c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2880de0b6b3a764000080c080a0948bf33d6628862819ad4f64a3bd9724a755e17a71e92820789d0b1b64e7d0faa06c24206f8755d798266a3060fa6179d8076cc298af8a5b8523a332caf5720c40');
+
+      const wallet = new Wallet({
+        ...defaultOptionsCoin,
+        crypto: {
+          ...ethereumATethereum,
+          platform: 'arbitrum',
+        },
+      });
+      await wallet.open(RANDOM_PUBLIC_KEY);
+      await wallet.load();
+
+      const id = await wallet.createTransaction({
+        gasLimit: wallet.gasLimit,
+        address: DESTIONATION_ADDRESS,
+        amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
+      }, RANDOM_SEED, false);
+      assert.equal(wallet.balance.value, 970000000000000000n);
+      assert.equal(id, '1234');
+    });
+
+    it('should create valid transaction (Arbitrum token)', async () => {
+      const request = sinon.stub(defaultOptionsToken, 'request');
+      utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
+      utils.stubTokenBalance(request, TOKEN_ADDRESS, WALLET_ADDRESS, { balance: '2000000', confirmedBalance: '2000000' });
+      utils.stubTxsCount(request, WALLET_ADDRESS, 10);
+      utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
+      utils.stubTransactionSend(request, '1234', '0x02f8b483066eee0a843b9aca008506fc23ac00831e848094dac17f958d2ee523a2206206994597c13d831ec780b844a9059cbb000000000000000000000000c02aaa39b223fe8d0a0e5c4f27ead9083c756cc200000000000000000000000000000000000000000000000000000000000f4240c001a060cf7018c1b53f200c4807c1898c1fe310b38282527f72674bba6a8e2b0455d9a05704169f09f85bb584697384429857f4b5a49efacffeaf721fe077dd4144c694');
+
+      const wallet = new Wallet({
+        ...defaultOptionsToken,
+        crypto: {
+          ...tetherATethereum,
+          platform: 'arbitrum',
+        },
+      });
+      await wallet.open(RANDOM_PUBLIC_KEY);
+      await wallet.load();
+
+      const id = await wallet.createTransaction({
+        gasLimit: wallet.gasLimit,
+        address: DESTIONATION_ADDRESS,
+        amount: new Amount(1_000000n, wallet.crypto.decimals),
+      }, RANDOM_SEED, false);
+      assert.equal(wallet.balance.value, 1_000000n);
+      assert.equal(id, '1234');
+    });
   });
 
   describe('createImport', () => {
