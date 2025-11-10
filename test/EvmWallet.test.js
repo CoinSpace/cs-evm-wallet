@@ -1068,6 +1068,17 @@ describe('EvmWallet.js', () => {
       const sig = '0xccc50f41fb89447eb1964c2deb51ba5182a1afe15d0b44dea690c3161d4d84854f939d20fa29c2112cc1f5c8232719dd5e139335b92935dfa880cf8f8312034b1b';
       assert.equal(await wallet.eth_signTypedData(TYPED_DATA, RANDOM_SEED, false), sig);
     });
+
+    it('should sign TypedData (filter extra fields)', async () => {
+      const wallet = new Wallet({
+        ...defaultOptionsCoin,
+      });
+      TYPED_DATA.message.priority = 'high';
+      TYPED_DATA.message.from.size = 'big';
+      TYPED_DATA.domain.private = 'true';
+      const sig = '0xccc50f41fb89447eb1964c2deb51ba5182a1afe15d0b44dea690c3161d4d84854f939d20fa29c2112cc1f5c8232719dd5e139335b92935dfa880cf8f8312034b1b';
+      assert.equal(await wallet.eth_signTypedData(TYPED_DATA, RANDOM_SEED, false), sig);
+    });
   });
 
   describe('staking', () => {
