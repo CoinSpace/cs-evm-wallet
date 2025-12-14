@@ -274,12 +274,23 @@ describe('EvmWallet.js', () => {
         assert.ok(await wallet.validateGasLimit({ gasLimit: 100500n }));
       });
 
-      it('invalid gas limit', async () => {
+      it('invalid gas limit (low)', async () => {
         await assert.rejects(async () => {
           await wallet.validateGasLimit({ gasLimit: 0n });
         }, {
-          name: 'GasLimitError',
-          message: 'Invalid gas limit',
+          name: 'SmallGasLimitError',
+          message: 'Small gas limit',
+          value: 21000n,
+        });
+      });
+
+      it('invalid gas limit (high)', async () => {
+        await assert.rejects(async () => {
+          await wallet.validateGasLimit({ gasLimit: 120_000000n });
+        }, {
+          name: 'BigGasLimitError',
+          message: 'Big gas limit',
+          value: 60_000000n,
         });
       });
     });
@@ -666,6 +677,28 @@ describe('EvmWallet.js', () => {
         amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
       }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 999370000000000000n);
+      assert.equal(id, '1234');
+    });
+
+    it('should create valid transaction with high gasLimit (Ethereum coin)', async () => {
+      const request = sinon.stub(defaultOptionsCoin, 'request');
+      utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '3000000000000000000', confirmedBalance: '4000000000000000000' });
+      utils.stubTxsCount(request, WALLET_ADDRESS, 10);
+      utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
+      utils.stubTransactionSend(request, '1234', '0x02f8778242680a843b9aca008506fc23ac008402faf08094c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2880de0b6b3a764000080c080a0c3006f7bcf5f30443a694e70ee0cefd22d8cdb619abbef4d298aa508f99c2274a0664fcf54dccb237e36b70ae8117a3d1f04bdb5d0ad48c05a7afbb88b021d23a9');
+
+      const wallet = new Wallet({
+        ...defaultOptionsCoin,
+      });
+      await wallet.open(RANDOM_PUBLIC_KEY);
+      await wallet.load();
+
+      const id = await wallet.createTransaction({
+        gasLimit: 50_000000n,
+        address: DESTIONATION_ADDRESS,
+        amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
+      }, RANDOM_SEED, false);
+      assert.equal(wallet.balance.value, 500000000000000000n);
       assert.equal(id, '1234');
     });
 
