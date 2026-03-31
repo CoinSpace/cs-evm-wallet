@@ -1000,13 +1000,20 @@ describe('EvmWallet.js', () => {
     it('works', async () => {
       const estimate = await wallet.estimateReplacement(txs[0]);
       assert.equal(estimate.percent, 0.2);
-      assert.equal(estimate.fee.value, 105000000000000n);
+      assert.equal(estimate.fee.value, 231000000000000n);
+    });
+
+    it('works when actual gas price is lower than tx gas price', async () => {
+      txs[0].maxFeePerGas = 60000000000n;
+      const estimate = await wallet.estimateReplacement(txs[0]);
+      assert.equal(estimate.percent, 0.2);
+      assert.equal(estimate.fee.value, 987000000000000n);
     });
 
     it('works (legacy tx)', async () => {
       const estimate = await wallet.estimateReplacement(txs[1]);
       assert.equal(estimate.percent, 0.2);
-      assert.equal(estimate.fee.value, 105000000000000n);
+      assert.equal(estimate.fee.value, 231000000000000n);
     });
 
     it('throw error not enough funds', async () => {
@@ -1042,8 +1049,18 @@ describe('EvmWallet.js', () => {
       const before = wallet.balance.value;
       const id = await wallet.createReplacementTransaction(txs[0], RANDOM_SEED);
       const after = wallet.balance.value;
-      assert.equal(before - after, 105000000000000n);
-      assert.equal(after, 1_999895000000000000n);
+      assert.equal(before - after, 231000000000000n);
+      assert.equal(after, 1_999769000000000000n);
+      assert.equal(id, '1234');
+    });
+
+    it('replace tx (coin) when actual gas price is lower than tx gas price', async () => {
+      const before = wallet.balance.value;
+      txs[0].maxFeePerGas = 60000000000n;
+      const id = await wallet.createReplacementTransaction(txs[0], RANDOM_SEED);
+      const after = wallet.balance.value;
+      assert.equal(before - after, 987000000000000n);
+      assert.equal(after, 1_999013000000000000n);
       assert.equal(id, '1234');
     });
 
@@ -1051,8 +1068,8 @@ describe('EvmWallet.js', () => {
       const before = wallet.balance.value;
       const id = await wallet.createReplacementTransaction(txs[1], RANDOM_SEED);
       const after = wallet.balance.value;
-      assert.equal(before - after, 105000000000000n);
-      assert.equal(after, 1_999895000000000000n);
+      assert.equal(before - after, 231000000000000n);
+      assert.equal(after, 1_999769000000000000n);
       assert.equal(id, '1234');
     });
 
@@ -1060,8 +1077,8 @@ describe('EvmWallet.js', () => {
       const before = wallet.balance.value;
       const id = await wallet.createReplacementTransaction(txs[2], RANDOM_SEED);
       const after = wallet.balance.value;
-      assert.equal(before - after, 1000000000000000n);
-      assert.equal(after, 1999000000000000000n);
+      assert.equal(before - after, 2200000000000000n);
+      assert.equal(after, 1997800000000000000n);
       assert.equal(id, '1234');
     });
 
@@ -1069,8 +1086,8 @@ describe('EvmWallet.js', () => {
       const before = wallet.balance.value;
       const id = await wallet.createReplacementTransaction(txs[3], RANDOM_SEED);
       const after = wallet.balance.value;
-      assert.equal(before - after, 1000000000000000n);
-      assert.equal(after, 1999000000000000000n);
+      assert.equal(before - after, 2200000000000000n);
+      assert.equal(after, 1_997800000000000000n);
       assert.equal(id, '1234');
     });
   });
