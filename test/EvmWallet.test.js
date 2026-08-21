@@ -663,7 +663,7 @@ describe('EvmWallet.js', () => {
       utils.stubCoinBalance(request, WALLET_ADDRESS, { balance: '2000000000000000000', confirmedBalance: '3000000000000000000' });
       utils.stubTxsCount(request, WALLET_ADDRESS, 10);
       utils.stubGasFees(request, { maxFeePerGas: '30000000000', maxPriorityFeePerGas: '1000000000' });
-      utils.stubTransactionSend(request, '1234', '0x02f8758242680a843b9aca008506fc23ac0082520894c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2880de0b6b3a764000080c001a04d19ab019b1a9ac70c26c32cc2b83bd9d65b2b3c3ed3e68bead499c509b481caa01222b1a3b8bf218db5f1329709b5731079b53570279c0c12561f9298ee9705e8');
+      utils.stubTransactionSend(request, '50a0dd0ab561b2f2f9e5a342661e396425572281e49f369e02c81883f9b1e3c5', '0x02f8758242680a843b9aca008506fc23ac0082520894c02aaa39b223fe8d0a0e5c4f27ead9083c756cc2880de0b6b3a764000080c001a04d19ab019b1a9ac70c26c32cc2b83bd9d65b2b3c3ed3e68bead499c509b481caa01222b1a3b8bf218db5f1329709b5731079b53570279c0c12561f9298ee9705e8');
 
       const wallet = new Wallet({
         ...defaultOptionsCoin,
@@ -677,7 +677,7 @@ describe('EvmWallet.js', () => {
         amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
       }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 999370000000000000n);
-      assert.equal(id, '1234');
+      assert.equal(id, '50a0dd0ab561b2f2f9e5a342661e396425572281e49f369e02c81883f9b1e3c5');
     });
 
     it('should create valid transaction with high gasLimit (Ethereum coin)', async () => {
@@ -699,7 +699,7 @@ describe('EvmWallet.js', () => {
         amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
       }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 500000000000000000n);
-      assert.equal(id, '1234');
+      assert.equal(id, '30fe3b194f8f8cd49bcfe5a863a52ffff908e3857ae7aec74448eba89f807355');
     });
 
     it('should create valid transaction (Ethereum token)', async () => {
@@ -722,7 +722,7 @@ describe('EvmWallet.js', () => {
         amount: new Amount(1_000000n, wallet.crypto.decimals),
       }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 1_000000n);
-      assert.equal(id, '1234');
+      assert.equal(id, '08309254cc1bc4cd0b6d14c9b210b13fff576a0278425a567e81fcd32cab4c70');
     });
 
     it('should create valid transaction (Ethereum Classic coin)', async () => {
@@ -748,7 +748,7 @@ describe('EvmWallet.js', () => {
         amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
       }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 999979000000000000n);
-      assert.equal(id, '1234');
+      assert.equal(id, 'c6ff1e8cd2436d6ae752df7a6924a514561a1b87ee899ee2721de00fe579f6b1');
     });
 
     it('should create valid transaction (Ethereum Classic token)', async () => {
@@ -775,7 +775,7 @@ describe('EvmWallet.js', () => {
         amount: new Amount(1_000000n, wallet.crypto.decimals),
       }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 1_000000n);
-      assert.equal(id, '1234');
+      assert.equal(id, '906819b26d62eb9e38f2117a3a8a4f770226b6e769014a6beb68c7144f183226');
     });
 
     it('should create valid transaction (Optimism coin)', async () => {
@@ -801,7 +801,7 @@ describe('EvmWallet.js', () => {
         amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
       }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 999370000000000000n);
-      assert.equal(id, '1234');
+      assert.equal(id, '139ecbd8483215a782e2673189af0febcb306072d0ecc69d322ff4ff4ccfdf4a');
     });
 
     it('should create valid transaction (Optimism token)', async () => {
@@ -828,7 +828,7 @@ describe('EvmWallet.js', () => {
         amount: new Amount(1_000000n, wallet.crypto.decimals),
       }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 1_000000n);
-      assert.equal(id, '1234');
+      assert.equal(id, '9d0edf08512c8e20d8af53ce62a9e25e0dc7d1095aa84b382bd0d41423a52452');
     });
 
     it('should create valid transaction (Arbitrum coin)', async () => {
@@ -854,7 +854,7 @@ describe('EvmWallet.js', () => {
         amount: new Amount(1_000000000000000000n, wallet.crypto.decimals),
       }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 970000000000000000n);
-      assert.equal(id, '1234');
+      assert.equal(id, '7e53454d8c253dd4fb3c93978423564c77925c6bc15b85c0188e73842f1bbfba');
     });
 
     it('should create valid transaction (Arbitrum token)', async () => {
@@ -881,7 +881,7 @@ describe('EvmWallet.js', () => {
         amount: new Amount(1_000000n, wallet.crypto.decimals),
       }, RANDOM_SEED, false);
       assert.equal(wallet.balance.value, 1_000000n);
-      assert.equal(id, '1234');
+      assert.equal(id, '335af3c3ad3d3f9e8b442550c1b1f594a8024f29743f5566b79caf6f0750fc9d');
     });
   });
 
